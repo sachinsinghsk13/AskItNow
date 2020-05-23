@@ -1,5 +1,6 @@
 package com.techjs.askitnow.model;
 
+import java.time.Instant;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -61,4 +62,6 @@ public class User {
 	private String bio;
 	
 	private boolean active;
+	
+	private Instant created;
 }

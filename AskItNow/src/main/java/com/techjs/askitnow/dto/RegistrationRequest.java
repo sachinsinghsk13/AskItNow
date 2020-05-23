@@ -15,7 +15,7 @@ public class RegistrationRequest {
 	private String username;
 	private String password;
 	private String email;
-	private String fullname;
+	private String name;
 	private Date dateOfBirth;
 	private Gender gender;
 	
