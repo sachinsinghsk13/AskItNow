@@ -1,10 +1,16 @@
 package com.techjs.askitnow.model;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.AttributeOverride;
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -46,7 +52,10 @@ public class Answer {
 	@JoinColumn(name = "question_id", nullable = false, referencedColumnName = "id")
 	private Question question;
 
-//	@OneToMany(fetch = FetchType.LAZY, mappedBy = "answer", orphanRemoval = true, cascade = CascadeType.ALL)
-//	private Set<Comment> comments = new HashSet<Comment>();
-//	
+
+	@ElementCollection
+	@CollectionTable(name = "answer_image_attachments")
+	@AttributeOverride(name = "contentType", column = @Column(name="content_type"))
+	private Collection<AnswerImageAttachment> imageAttachments = new ArrayList<AnswerImageAttachment>();
+	
 }

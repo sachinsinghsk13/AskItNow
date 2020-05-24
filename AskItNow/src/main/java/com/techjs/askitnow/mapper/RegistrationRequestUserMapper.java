@@ -9,15 +9,8 @@ import com.techjs.askitnow.dto.RegistrationRequest;
 import com.techjs.askitnow.model.User;
 
 @Mapper(componentModel = "spring")
-public abstract class RegistrationRequestUserMapper {
+public interface RegistrationRequestUserMapper {
 	
-	@Autowired
-	protected PasswordEncoder passwordEncoder;
-	
-	@Mapping(target = "password", expression = "java(encode(registrationRequest.getPassword()))")
 	public abstract User mapToUser(RegistrationRequest registrationRequest);
 
-	protected String encode(String s) {
-		return passwordEncoder.encode(s);
-	}
 }

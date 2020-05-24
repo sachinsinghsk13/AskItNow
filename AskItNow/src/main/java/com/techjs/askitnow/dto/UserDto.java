@@ -1,40 +1,28 @@
-package com.techjs.askitnow.model;
+package com.techjs.askitnow.dto;
 
 import java.time.Instant;
 import java.util.Date;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.techjs.askitnow.security.ApplicationSecurityRole;
+import com.techjs.askitnow.model.Address;
+import com.techjs.askitnow.model.Gender;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "users")
-public class User {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UserDto {
+
 	@Column(name = "id")
 	private Long id;
 	
-	@Column(name = "full_name", nullable = false)
 	@NotNull
 	@Size
 	private String name;
@@ -42,23 +30,13 @@ public class User {
 	
 	@NotNull(message = "username can't be null")
 	@Size(message = "username must be mininum 4 characters and maximum 16 character long")
-	@Column(name = "username")
 	private String username;
-	
-	@NotNull(message = "password can't be null")
-	@Size
-	private String password;
 	
 	@Email
 	@NotNull
 	private String email;
 	
-	@Enumerated(EnumType.STRING)
 	private Gender gender;
-	
-	@Enumerated(EnumType.STRING)
-	@Column(name = "security_role")
-	private ApplicationSecurityRole securityRole;
 	
 	private Address address;
 	
@@ -67,8 +45,6 @@ public class User {
 	private String profession;
 	
 	private String bio;
-	
-	private boolean active;
 	
 	private Instant created;
 }

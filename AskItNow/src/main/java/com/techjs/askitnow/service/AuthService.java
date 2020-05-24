@@ -17,6 +17,7 @@ import com.techjs.askitnow.model.User;
 import com.techjs.askitnow.model.VerificationToken;
 import com.techjs.askitnow.repository.UserRepository;
 import com.techjs.askitnow.repository.VerificationTokenRepository;
+import com.techjs.askitnow.security.ApplicationSecurityRole;
 
 @Service
 public class AuthService {
@@ -41,6 +42,8 @@ public class AuthService {
 		User user = registrationRequestUserMapper.mapToUser(registrationRequest);
 		user.setCreated(Instant.now());
 		user.setActive(false);
+		user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
+		user.setSecurityRole(ApplicationSecurityRole.MEMBER);
 		userRepository.save(user);
 		String token = generateVerificationToken(user);
 		NotificationEmail ne = new NotificationEmail();
@@ -63,7 +66,7 @@ public class AuthService {
 		userRepository.save(user);
 	}
 	
-	private void verifyToken(String token) {
+	public void verifyToken(String token) {
 		Optional<VerificationToken> verficationToken = verificationTokenRepository.findByToken(token);
 		fetchUserAndActivate(verficationToken.orElseThrow(()-> new InvalidVerificationToken()));
 	}
