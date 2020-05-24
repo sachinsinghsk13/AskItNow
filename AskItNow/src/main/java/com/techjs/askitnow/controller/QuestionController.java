@@ -5,7 +5,10 @@ import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.techjs.askitnow.dto.ImageResponse;
 import com.techjs.askitnow.dto.QuestionDto;
 import com.techjs.askitnow.dto.QuestionPayLoad;
 import com.techjs.askitnow.model.Question;
@@ -38,21 +42,29 @@ public class QuestionController {
 	
 	@GetMapping
 	public ResponseEntity<List<QuestionDto>> getAllQuestions(@AuthenticationPrincipal UserDetails user) {
-		Question question = new Question();
-		question.setId(3L);
-		System.out.println(answerRepository.getAnswerCountByQuestion(question));
+		System.out.println(user.getUsername());
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 	
 	@GetMapping("/by-user/{username}")
 	public ResponseEntity<List<QuestionDto>> getQuestionByUser(@PathVariable("username") String username) {
 		List<QuestionDto> questionDtos = questionService.getQuestionDtoByUser(username);
+		return ResponseEntity.status(HttpStatus.OK).body(questionDtos);
 		
 	}
 	
 	@GetMapping("/{questionId}")
 	public ResponseEntity<QuestionDto> getQuestion(@PathVariable("questionId") Long questionId) {
 		return ResponseEntity.status(HttpStatus.OK).body(questionService.getQuestionDto(questionId));
+	}
+	
+	@GetMapping("/{questionId}/images/{filename}")
+	public ResponseEntity<byte[]> getQuestionImage(@PathVariable("questionId") Long questionId,@PathVariable String filename) throws IOException {
+		ImageResponse ir = questionService.getQuestionImage(questionId, filename);
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Content-Type", ir.getContentType());
+		headers.set("Content-Disposition", "attachment; filename=" + filename);
+		return new ResponseEntity<byte[]>(ir.getData(), headers,HttpStatus.OK);
 	}
 	
 	@PostMapping

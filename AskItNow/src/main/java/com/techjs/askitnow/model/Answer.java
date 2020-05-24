@@ -53,9 +53,9 @@ public class Answer {
 	private Question question;
 
 
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "answer_image_attachments")
 	@AttributeOverride(name = "contentType", column = @Column(name="content_type"))
-	private Collection<AnswerImageAttachment> imageAttachments = new ArrayList<AnswerImageAttachment>();
+	private Set<ImageAttachment> imageAttachments = new HashSet<ImageAttachment>();
 	
 }

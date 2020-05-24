@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.techjs.askitnow.model.Category;
-import com.techjs.askitnow.model.QuestionImageAttachment;
+import com.techjs.askitnow.model.ImageAttachment;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,5 +22,5 @@ public class QuestionDto {
 	private Category category;
 	private String postedBy;
 	private Long totalAnswers;
-	private Collection<QuestionImageAttachment> imageAttachments;
+	private Collection<ImageAttachment> imageAttachments;
 }

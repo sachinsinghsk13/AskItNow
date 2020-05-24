@@ -1,5 +1,7 @@
 package com.techjs.askitnow.dto;
 
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
@@ -15,5 +17,5 @@ public class QuestionPayLoad {
 	private String title;
 	private String body;
 	private Long categoryId;
-	private MultipartFile[] images;
+	private List<MultipartFile> images;
 }

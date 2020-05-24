@@ -62,6 +62,6 @@ public class Question {
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "question_image_attachments")
 	@AttributeOverride(name = "contentType", column = @Column(name="content_type"))
-	private Collection<QuestionImageAttachment> imageAttachments = new ArrayList<QuestionImageAttachment>();
+	private Set<ImageAttachment> imageAttachments = new HashSet<ImageAttachment>();
 			
 }

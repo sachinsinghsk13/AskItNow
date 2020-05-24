@@ -10,8 +10,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnswerImageAttachment {
+public class ImageAttachment {
 	private String filename;
 	private String contentType;
+	private String extension;
 	private long size;
 }
