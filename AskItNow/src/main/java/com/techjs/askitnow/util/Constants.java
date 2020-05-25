@@ -5,4 +5,5 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class Constants {
 	public static final String QUESTION_IMAGE_ATTACHMENT_DIRECTORY = "/home/sachinsingh/Documents/AskItNow/QuestionImages";
+	public static final String ANSWER_IMAGE_ATTACHMENT_DIRECTORY = "/home/sachinsingh/Documents/AskItNow/AnswerImages";
 }

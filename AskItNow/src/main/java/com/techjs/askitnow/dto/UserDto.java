@@ -27,7 +27,6 @@ public class UserDto {
 	@Size
 	private String name;
 	
-	
 	@NotNull(message = "username can't be null")
 	@Size(message = "username must be mininum 4 characters and maximum 16 character long")
 	private String username;

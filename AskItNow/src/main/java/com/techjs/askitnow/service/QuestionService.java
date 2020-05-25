@@ -10,6 +10,8 @@ import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -58,7 +60,6 @@ public class QuestionService {
 
 		question = questionRepository.save(question);
 
-		
 		if (questionPayLoad.getImages() != null && questionPayLoad.getImages().size() > 0) {
 			for (MultipartFile image : questionPayLoad.getImages()) {
 				ImageAttachment ia = new ImageAttachment();
@@ -84,7 +85,7 @@ public class QuestionService {
 			}
 			question = questionRepository.save(question);
 		}
-		
+
 		return questionDtoMapper.mapToDto(question);
 	}
 
@@ -106,12 +107,13 @@ public class QuestionService {
 		return ir;
 	}
 
-	public List<QuestionDto> getQuestionDtoByUser(String username) {
-		Iterable<Question> questions = questionRepository.findQuestionByUser(username);
-		List<QuestionDto> questionDtos = new ArrayList<QuestionDto>();
-		questions.forEach(q -> {
-			questionDtos.add(questionDtoMapper.mapToDto(q));
-		});
-		return questionDtos;
+	public Page<QuestionDto> getQuestionDtoByUser(String username, Pageable pageable) {
+		Page<Question> questions = questionRepository.findQuestionByUser(username, pageable);
+		return questions.map(question -> questionDtoMapper.mapToDto(question));
+	}
+
+	public Question getQuestionById(Long questionId) {
+		return questionRepository.findById(questionId)
+				.orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " is not found."));
 	}
 }

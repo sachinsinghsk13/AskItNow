@@ -5,6 +5,9 @@ import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -47,8 +50,8 @@ public class QuestionController {
 	}
 	
 	@GetMapping("/by-user/{username}")
-	public ResponseEntity<List<QuestionDto>> getQuestionByUser(@PathVariable("username") String username) {
-		List<QuestionDto> questionDtos = questionService.getQuestionDtoByUser(username);
+	public ResponseEntity<Page<QuestionDto>> getQuestionByUser(@PathVariable("username") String username,@PageableDefault(sort = {"postedTime"}) Pageable pageable) {
+		Page<QuestionDto> questionDtos = questionService.getQuestionDtoByUser(username, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(questionDtos);
 		
 	}

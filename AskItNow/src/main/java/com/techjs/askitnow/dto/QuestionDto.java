@@ -20,7 +20,7 @@ public class QuestionDto {
 	private String body;
 	private String duration;
 	private Category category;
-	private String postedBy;
+	private UserEmbeddedDto postedBy;
 	private Long totalAnswers;
 	private Collection<ImageAttachment> imageAttachments;
 }
