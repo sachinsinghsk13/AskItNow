@@ -6,4 +6,5 @@ import lombok.Data;
 public class ImageResponse {
 	private byte[] data;
 	private String contentType;
+	private String filename;
 }

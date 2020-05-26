@@ -1,5 +1,6 @@
 package com.techjs.askitnow.service;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,6 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.techjs.askitnow.dto.AnswerDto;
 import com.techjs.askitnow.dto.AnswerPayload;
+import com.techjs.askitnow.dto.ImageResponse;
+import com.techjs.askitnow.exception.ResourceMisMatchException;
+import com.techjs.askitnow.exception.ResourceNotFoundException;
 import com.techjs.askitnow.mapper.AnswerDtoMapper;
 import com.techjs.askitnow.model.Answer;
 import com.techjs.askitnow.model.ImageAttachment;
@@ -30,7 +34,7 @@ public class AnswerService {
 
 	@Autowired
 	private QuestionService questionService;
-	
+
 	@Autowired
 	private AnswerRepository answerRepository;
 
@@ -39,7 +43,7 @@ public class AnswerService {
 
 	@Autowired
 	private AnswerDtoMapper answerMapper;
-	
+
 	public Long getAnswerCountByQuestion(Question question) {
 		return answerRepository.countByQuestion(question);
 	}
@@ -49,15 +53,15 @@ public class AnswerService {
 		Question question = questionService.getQuestionById(answerPayload.getQuestionId());
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User user = userService.getActiveUserByUsername(userDetails.getUsername());
-		
+
 		Answer answer = new Answer();
 		answer.setBody(answerPayload.getBody());
 		answer.setQuestion(question);
 		answer.setPostedBy(user);
 		answer.setPostedTime(Instant.now());
-		
+
 		answer = answerRepository.save(answer);
-	
+
 		if (answerPayload.getImages() != null && answerPayload.getImages().size() > 0) {
 			for (MultipartFile image : answerPayload.getImages()) {
 				ImageAttachment ia = new ImageAttachment();
@@ -72,8 +76,8 @@ public class AnswerService {
 
 				ia.setFilename(sb.toString());
 
-				FileOutputStream fos = new FileOutputStream(Constants.ANSWER_IMAGE_ATTACHMENT_DIRECTORY + "/"
-						+ ia.getFilename() + "." + ia.getExtension());
+				FileOutputStream fos = new FileOutputStream(
+						Constants.ANSWER_IMAGE_ATTACHMENT_DIRECTORY + "/" + ia.getFilename() + "." + ia.getExtension());
 
 				fos.write(image.getBytes());
 				fos.flush();
@@ -83,14 +87,44 @@ public class AnswerService {
 			}
 			answer = answerRepository.save(answer);
 		}
-	
+
 		return answerMapper.mapToDto(answer);
 	}
 
+	@Transactional(readOnly = true)
 	public Page<AnswerDto> getAllAnswers(Long questionId, Pageable pageable) {
 		Question question = questionService.getQuestionById(questionId);
 		Page<Answer> answers = answerRepository.findAllByQuestion(question, pageable);
 		return answers.map(a -> answerMapper.mapToDto(a));
+	}
+
+	public AnswerDto getAnswerDto(Long questionId, Long answerid) {
+		Question question = questionService.getQuestionById(questionId);
+		Answer answer = answerRepository.findByQuestionAndId(question, answerid)
+				.orElseThrow(() -> new ResourceMisMatchException("Requested Answer Not Found"));
+		return answerMapper.mapToDto(answer);
+	}
+
+	public ImageResponse getAnswerImage(Long questionId, Long answerId, String filename) throws IOException {
+		Question question = questionService.getQuestionById(questionId);
+		Answer answer = answerRepository.findByQuestionAndId(question, answerId)
+				.orElseThrow(() -> new ResourceMisMatchException("Requested Answer Not Found"));
+		ImageAttachment ia = answer.getImageAttachments().stream().filter(image -> image.getFilename().equals(filename))
+				.findFirst().orElseThrow(() -> new ResourceNotFoundException("Image Not Found"));
+		
+		String filenameWithExtension = ia.getFilename() + "." + ia.getExtension();
+		FileInputStream fis = new FileInputStream(
+				Constants.ANSWER_IMAGE_ATTACHMENT_DIRECTORY + "/" +filenameWithExtension);
+		
+		ImageResponse ir = new ImageResponse();
+		ir.setContentType(ia.getContentType());
+		ir.setFilename(filenameWithExtension);
+		ir.setData(fis.readAllBytes());
+		return ir;
+	}
+	
+	public Answer getAnswerByQuestionAndId(Question question, Long id) {
+		return answerRepository.findByQuestionAndId(question, id).orElseThrow(() -> new ResourceNotFoundException("Answer Not Found"));
 	}
 
 }

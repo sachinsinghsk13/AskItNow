@@ -41,7 +41,7 @@ public class QuestionController {
 	private QuestionService questionService;
 	
 	@Autowired
-	private AnswerService answerRepository;
+	private AnswerService answerService;
 	
 	@GetMapping
 	public ResponseEntity<List<QuestionDto>> getAllQuestions(@AuthenticationPrincipal UserDetails user) {
@@ -65,13 +65,16 @@ public class QuestionController {
 	public ResponseEntity<byte[]> getQuestionImage(@PathVariable("questionId") Long questionId,@PathVariable String filename) throws IOException {
 		ImageResponse ir = questionService.getQuestionImage(questionId, filename);
 		HttpHeaders headers = new HttpHeaders();
-		headers.set("Content-Type", ir.getContentType());
-		headers.set("Content-Disposition", "attachment; filename=" + filename);
-		return new ResponseEntity<byte[]>(ir.getData(), headers,HttpStatus.OK);
+		headers.setContentType(MediaType.parseMediaTypes(ir.getContentType()).get(0));
+		headers.setContentDisposition(ContentDisposition.builder("attachment").filename(ir.getFilename()).build());
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.headers(headers)
+				.body(ir.getData());
 	}
 	
 	@PostMapping
-	public ResponseEntity<QuestionDto> postQuestion(@ModelAttribute QuestionPayLoad questionPayLoad, @AuthenticationPrincipal UserDetails user) throws IOException {
+	public ResponseEntity<QuestionDto> postQuestion(@ModelAttribute QuestionPayLoad questionPayLoad) throws IOException {
 		return ResponseEntity
 				.status(HttpStatus.CREATED)
 				.body(questionService.postQuestion(questionPayLoad));

@@ -99,11 +99,13 @@ public class QuestionService {
 		ImageAttachment ia = dto.getImageAttachments().stream().filter(ias -> ias.getFilename().equals(filename))
 				.findFirst().orElseThrow(() -> new ResourceNotFoundException("Image Not Found"));
 
+		String filenameWithExtension = ia.getFilename() + "." + ia.getExtension();
 		FileInputStream fis = new FileInputStream(
-				Constants.QUESTION_IMAGE_ATTACHMENT_DIRECTORY + "/" + ia.getFilename() + "." + ia.getExtension());
+				Constants.QUESTION_IMAGE_ATTACHMENT_DIRECTORY + "/" + filenameWithExtension);
 		ImageResponse ir = new ImageResponse();
 		ir.setData(fis.readAllBytes());
 		ir.setContentType(ia.getContentType());
+		ir.setFilename(filenameWithExtension);
 		return ir;
 	}
 

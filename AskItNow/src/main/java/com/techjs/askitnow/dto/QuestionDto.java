@@ -18,6 +18,7 @@ public class QuestionDto {
 	private Long id;
 	private String title;
 	private String body;
+	private Instant postedTime;
 	private String duration;
 	private Category category;
 	private UserEmbeddedDto postedBy;
