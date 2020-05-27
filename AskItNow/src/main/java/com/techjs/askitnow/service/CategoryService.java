@@ -1,6 +1,8 @@
 package com.techjs.askitnow.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.techjs.askitnow.exception.ResourceNotFoundException;
@@ -13,8 +15,8 @@ public class CategoryService {
 	@Autowired
 	private CategoryRepository categoryRepository;
 
-	public Iterable<Category> getAllCategory() {
-		return categoryRepository.findAll();
+	public Page<Category> getAllCategory(Pageable pageable) {
+		return categoryRepository.findAll(pageable);
 	}
 
 	public Category save(Category category) {
