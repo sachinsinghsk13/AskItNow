@@ -39,7 +39,7 @@ public class Answer {
 	private Long id;
 	
 	@NotNull
-	@Size
+	@Size(min = 1, max = 512, message = "answer length must be between 1 to 512 characters")
 	private String body;
 	
 	private Instant postedTime;

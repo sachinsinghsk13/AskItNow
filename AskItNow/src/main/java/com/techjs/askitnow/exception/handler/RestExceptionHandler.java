@@ -3,8 +3,11 @@ package com.techjs.askitnow.exception.handler;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -104,5 +107,29 @@ public class RestExceptionHandler {
 		return new ResponseEntity<>(ed, HttpStatus.NOT_ACCEPTABLE);
 	}
 	
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException cve) {
+		ErrorDetail ed = new ErrorDetail();
+		ed.setTimestamp(new Date().getTime());
+		ed.setTitle("Validation Error");
+		ed.setStatus(HttpStatus.BAD_REQUEST.value());
+		ed.setDetail("Input Validation Faild");
+		ed.setDeveloperMessage(cve.getClass().getCanonicalName());
+		
+		Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
+		constraintViolations.forEach(fe -> {
+			List<ValidationError> validationErrorsList = ed.getValidationErrors().get(fe.getPropertyPath().toString());
+			if (validationErrorsList == null) {
+				validationErrorsList = new ArrayList<>();
+				ed.getValidationErrors().put(fe.getPropertyPath().toString(), validationErrorsList);
+			}
+			ValidationError ve = new ValidationError();
+			ve.setCode(fe.getRootBean().getClass().getName() + "." + fe.getPropertyPath().toString());
+			ve.setMessage(fe.getMessage());
+			validationErrorsList.add(ve);
+		});
+		
+		return new ResponseEntity<>(ed, null, HttpStatus.BAD_REQUEST);
+	}
 	
 }

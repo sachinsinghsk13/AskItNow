@@ -1,6 +1,7 @@
 package com.techjs.askitnow.dto;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -39,7 +40,7 @@ public class UserDto {
 	
 	private Address address;
 	
-	private Date dateOfBirth;
+	private LocalDate dateOfBirth;
 	
 	private String profession;
 	

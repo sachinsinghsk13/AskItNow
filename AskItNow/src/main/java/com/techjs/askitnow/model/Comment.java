@@ -29,7 +29,7 @@ public class Comment {
 	private Long id;
 	
 	@NotNull
-	@Size
+	@Size(min = 1, max = 40, message = "Comment length must be between 1 to 40 characters")
 	private String body;
 	
 	private Instant postedTime;
