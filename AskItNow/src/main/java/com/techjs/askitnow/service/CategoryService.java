@@ -24,7 +24,6 @@ public class CategoryService {
 	}
 
 	public Category getCategory(Long categoryId) {
-		System.out.println("cate " + categoryId);
 		return categoryRepository.findById(categoryId)
 					.orElseThrow(() -> new ResourceNotFoundException("Category Not Found"));
 	}

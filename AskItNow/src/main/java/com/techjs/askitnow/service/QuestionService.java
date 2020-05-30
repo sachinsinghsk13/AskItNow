@@ -8,6 +8,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.NoPermissionException;
+
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -104,6 +106,7 @@ public class QuestionService {
 				Constants.QUESTION_IMAGE_ATTACHMENT_DIRECTORY + "/" + filenameWithExtension);
 		ImageResponse ir = new ImageResponse();
 		ir.setData(fis.readAllBytes());
+		fis.close();
 		ir.setContentType(ia.getContentType());
 		ir.setFilename(filenameWithExtension);
 		return ir;
@@ -117,5 +120,22 @@ public class QuestionService {
 	public Question getQuestionById(Long questionId) {
 		return questionRepository.findById(questionId)
 				.orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " is not found."));
+	}
+
+	public Page<QuestionDto> getRecentQuestions(Pageable pageable) {
+		Page<Question> questions = questionRepository.findAll(pageable);
+		return questions.map(q -> questionDtoMapper.mapToDto(q));
+		
+	}
+
+	public void deleteQuestion(Long questionId) throws NoPermissionException {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Question question = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException());
+
+		if (!question.getPostedBy().getUsername().equals(userDetails.getUsername()))
+			throw new NoPermissionException();
+		questionRepository.delete(question);
+		
+	
 	}
 }

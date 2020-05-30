@@ -4,9 +4,13 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
+import javax.naming.NoPermissionException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -15,10 +19,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,13 +50,14 @@ public class QuestionController {
 	private AnswerService answerService;
 	
 	@GetMapping
-	public ResponseEntity<List<QuestionDto>> getAllQuestions(@AuthenticationPrincipal UserDetails user) {
-		System.out.println(user.getUsername());
-		return ResponseEntity.status(HttpStatus.OK).build();
+	public ResponseEntity<Page<QuestionDto>> getAllQuestions(@PageableDefault(sort = "postedTime", direction = Direction.DESC) Pageable pageable) {
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(questionService.getRecentQuestions(pageable));
 	}
 	
 	@GetMapping("/by-user/{username}")
-	public ResponseEntity<Page<QuestionDto>> getQuestionByUser(@PathVariable("username") String username,@PageableDefault(sort = {"postedTime"}) Pageable pageable) {
+	public ResponseEntity<Page<QuestionDto>> getQuestionByUser(@PathVariable("username") String username,@PageableDefault(sort = {"postedTime"}, direction = Direction.DESC) Pageable pageable) {
 		Page<QuestionDto> questionDtos = questionService.getQuestionDtoByUser(username, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(questionDtos);
 		
@@ -59,6 +66,23 @@ public class QuestionController {
 	@GetMapping("/{questionId}")
 	public ResponseEntity<QuestionDto> getQuestion(@PathVariable("questionId") Long questionId) {
 		return ResponseEntity.status(HttpStatus.OK).body(questionService.getQuestionDto(questionId));
+	}
+	
+	
+	@PutMapping("/{questionId}")
+	public ResponseEntity<QuestionDto> updateQuestion(@ModelAttribute QuestionPayLoad questionPayLoad) {
+		System.out.println("update queswtoins");
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(null);
+	}
+	
+	
+	@DeleteMapping("/{questionId}")
+	public ResponseEntity<?> deleteQuestion(@PathVariable("questionId") Long questionId) throws NoPermissionException {
+		questionService.deleteQuestion(questionId);
+		return ResponseEntity
+				.status(HttpStatus.OK).build();
 	}
 	
 	@GetMapping("/{questionId}/images/{filename}")
